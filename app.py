@@ -24,6 +24,106 @@ st.set_page_config(
     layout="wide",
 )
 
+# ── Folder-tree helpers ───────────────────────────────────────────────────────
+
+def _split(folder_path: str) -> list[str]:
+    """Split a folder path into parts regardless of separator."""
+    return folder_path.replace("\\", "/").split("/")
+
+
+def _make_tree(folder_paths: list[str]) -> dict:
+    """Build a nested dict from folder paths. Leaves are empty dicts."""
+    tree: dict = {}
+    for fp in folder_paths:
+        node = tree
+        for part in _split(fp):
+            node = node.setdefault(part, {})
+    return tree
+
+
+def _fkey(parts: list[str]) -> str:
+    """Stable session-state key for a folder node."""
+    return "folder__" + "__".join(parts)
+
+
+def _folder_toggle(folder_key: str, model_names: list[str]) -> None:
+    """on_change callback: push folder checkbox value down to its models."""
+    val = st.session_state[folder_key]
+    for n in model_names:
+        st.session_state[f"mdl_{n}"] = val
+
+
+def _all_models_under(parts: list[str], folders_by_path: dict[str, list[str]]) -> list[str]:
+    """Collect every model name under a folder node (including descendants)."""
+    prefix = "/".join(parts)
+    names: list[str] = []
+    for fp, ms in folders_by_path.items():
+        norm = fp.replace("\\", "/")
+        if norm == prefix or norm.startswith(prefix + "/"):
+            names.extend(ms)
+    return names
+
+
+def _render_tree(
+    node: dict,
+    path_parts: list[str],
+    folders_by_path: dict[str, list[str]],
+    visible: set[str],
+    depth: int = 0,
+) -> None:
+    """Recursively render folder checkboxes + model checkboxes with indentation."""
+    STEP = 0.07  # indent ratio per depth level
+
+    for seg in sorted(node):
+        child_parts = path_parts + [seg]
+        child_key_norm = "/".join(child_parts)
+
+        # Models that live directly in this folder
+        direct_models = sorted(
+            folders_by_path.get(child_key_norm)
+            or folders_by_path.get("\\".join(child_parts))
+            or []
+        )
+        # All models under this subtree (for folder toggle propagation)
+        all_models = sorted(_all_models_under(child_parts, folders_by_path))
+
+        fkey = _fkey(child_parts)
+        if fkey not in st.session_state:
+            st.session_state[fkey] = True
+
+        label = f"📁 {seg}" + (f" ({len(all_models)})" if all_models else "")
+
+        # Indent via columns (depth > 0 only)
+        if depth > 0:
+            _, cont = st.columns([depth * STEP, 1 - depth * STEP])
+        else:
+            cont = st.sidebar
+
+        cont.checkbox(
+            label,
+            key=fkey,
+            on_change=_folder_toggle,
+            args=(fkey, all_models),
+        )
+
+        # Individual model checkboxes under this folder
+        if direct_models:
+            m_depth = depth + 1
+            for name in direct_models:
+                _, mc = st.columns([m_depth * STEP, 1 - m_depth * STEP])
+                with mc:
+                    if st.checkbox(
+                        name,
+                        key=f"mdl_{name}",
+                        value=st.session_state.get(f"mdl_{name}", True),
+                    ):
+                        visible.add(name)
+
+        # Recurse into sub-folders
+        if node[seg]:
+            _render_tree(node[seg], child_parts, folders_by_path, visible, depth + 1)
+
+
 # ── Sidebar — path input ──────────────────────────────────────────────────────
 with st.sidebar:
     st.title("⚙️ Settings")
@@ -32,11 +132,9 @@ with st.sidebar:
     default_path = str(Path.cwd())
     project_path = st.text_input(
         "dbt project directory",
-        value=st.session_state.get("project_path", default_path),
+        value=st.session_state.get("loaded_path", default_path),
         help="Absolute path to the root of your dbt project. Press Enter or click Reload.",
-        key="path_input",
     )
-
     reload = st.button("🔄 Reload", use_container_width=True)
 
 # ── Reload when path changes (Enter) or button clicked ───────────────────────
@@ -53,7 +151,7 @@ if "models" not in st.session_state or reload or path_changed:
 
 models = st.session_state.get("models", [])
 
-# ── Sidebar — two-level filter (folder → individual models) ──────────────────
+# ── Sidebar — two-level filter ────────────────────────────────────────────────
 with st.sidebar:
     st.markdown("---")
     st.subheader("Filter models")
@@ -61,47 +159,29 @@ with st.sidebar:
     visible: set[str] = set()
 
     if models:
-        folders: dict[str, list[str]] = defaultdict(list)
+        folders_by_path: dict[str, list[str]] = defaultdict(list)
         for m in models:
-            folders[m.folder].append(m.name)
+            folders_by_path[m.folder.replace("\\", "/")].append(m.name)
+
+        all_model_names = [m.name for m in models]
 
         col1, col2 = st.columns(2)
         if col1.button("All", use_container_width=True):
-            for names in folders.values():
-                for n in names:
-                    st.session_state[f"mdl_{n}"] = True
+            for n in all_model_names:
+                st.session_state[f"mdl_{n}"] = True
+            # Also update every folder key so checkboxes reflect state
+            for fp in folders_by_path:
+                for depth in range(1, len(_split(fp)) + 1):
+                    st.session_state[_fkey(_split(fp)[:depth])] = True
         if col2.button("None", use_container_width=True):
-            for names in folders.values():
-                for n in names:
-                    st.session_state[f"mdl_{n}"] = False
+            for n in all_model_names:
+                st.session_state[f"mdl_{n}"] = False
+            for fp in folders_by_path:
+                for depth in range(1, len(_split(fp)) + 1):
+                    st.session_state[_fkey(_split(fp)[:depth])] = False
 
-        for folder in sorted(folders):
-            model_names = sorted(folders[folder])
-
-            # Folder-level toggle: checks/unchecks all models in the folder
-            all_on  = all(st.session_state.get(f"mdl_{n}", True) for n in model_names)
-            some_on = any(st.session_state.get(f"mdl_{n}", True) for n in model_names)
-            folder_val = st.checkbox(
-                f"📁 {folder} ({len(model_names)})",
-                value=all_on,
-                key=f"folder_{folder}",
-            )
-            # Propagate folder toggle to individual models when it changes
-            prev_folder_val = st.session_state.get(f"folder_prev_{folder}", all_on)
-            if folder_val != prev_folder_val:
-                for n in model_names:
-                    st.session_state[f"mdl_{n}"] = folder_val
-            st.session_state[f"folder_prev_{folder}"] = folder_val
-
-            # Individual model checkboxes, indented
-            for name in model_names:
-                checked = st.checkbox(
-                    f"  {name}",
-                    value=st.session_state.get(f"mdl_{name}", True),
-                    key=f"mdl_{name}",
-                )
-                if checked:
-                    visible.add(name)
+        tree = _make_tree(list(folders_by_path.keys()))
+        _render_tree(tree, [], folders_by_path, visible, depth=0)
 
 # ── Main area ─────────────────────────────────────────────────────────────────
 st.title("📦 dbt ER Diagram")
@@ -123,14 +203,20 @@ else:
         import pandas as pd
 
         for model in sorted(models, key=lambda m: (m.folder, m.name)):
-            st.markdown(f"### `{model.name}` <small>— {model.folder}</small>", unsafe_allow_html=True)
+            st.markdown(
+                f"### `{model.name}` <small>— {model.folder}</small>",
+                unsafe_allow_html=True,
+            )
             if model.description:
                 st.markdown(f"*{model.description}*")
 
             if model.columns:
                 rows = []
                 for col in model.columns:
-                    fk_info = f"{col.foreign_key.to_model}.{col.foreign_key.to_column}" if col.foreign_key else ""
+                    fk_info = (
+                        f"{col.foreign_key.to_model}.{col.foreign_key.to_column}"
+                        if col.foreign_key else ""
+                    )
                     rows.append({
                         "Column": col.name,
                         "Type": col.data_type or "",
@@ -138,8 +224,9 @@ else:
                         "FK →": fk_info,
                         "Description": col.description,
                     })
-                st.dataframe(pd.DataFrame(rows), width='stretch', hide_index=True)
+                st.dataframe(pd.DataFrame(rows), width="stretch", hide_index=True)
             else:
                 st.write("*No columns defined.*")
+
 
 
