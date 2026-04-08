@@ -237,7 +237,7 @@ else:
         white-space:nowrap; display:block; cursor:help; }
 </style>"""
 
-        for model in sorted(models, key=lambda m: (m.folder, m.name)):
+        for model in sorted((m for m in models if m.name in visible), key=lambda m: (m.folder, m.name)):
             st.markdown(
                 f"### `{model.name}` <small>— {model.folder}</small>",
                 unsafe_allow_html=True,
