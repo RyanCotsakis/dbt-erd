@@ -25,7 +25,7 @@ Point it at any dbt project directory and it reads your YAML schema files to ren
 ## Installation
 
 ```bash
-git clone https://github.com/<you>/dbt-erd.git
+git clone https://github.com/RyanCotsakis/dbt-erd.git
 cd dbt-erd
 pip install -r requirements.txt
 ```
