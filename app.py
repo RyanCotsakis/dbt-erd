@@ -6,12 +6,12 @@ Usage:
 """
 from __future__ import annotations
 
+import base64
 import sys
 from collections import defaultdict
 from pathlib import Path
 
 import streamlit as st
-import streamlit.components.v1 as components
 
 sys.path.insert(0, str(Path(__file__).parent))
 
@@ -124,11 +124,9 @@ def _render_tree(
             for name in direct_models:
                 _, mc = st.columns([m_depth * STEP, 1 - m_depth * STEP])
                 with mc:
-                    if st.checkbox(
-                        name,
-                        key=f"mdl_{name}",
-                        value=st.session_state.get(f"mdl_{name}", True),
-                    ):
+                    if f"mdl_{name}" not in st.session_state:
+                        st.session_state[f"mdl_{name}"] = True
+                    if st.checkbox(name, key=f"mdl_{name}"):
                         visible.add(name)
 
         # Recurse into sub-folders
@@ -209,7 +207,8 @@ else:
         st.info("Select at least one model in the sidebar to display the diagram.")
     else:
         html_content = build_network(models, visible_models=visible)
-        components.html(html_content, height=780, scrolling=False)
+        src = "data:text/html;base64," + base64.b64encode(html_content.encode()).decode()
+        st.iframe(src, height=780)
 
     with st.expander("🔍 Raw model details", expanded=False):
         import html as _html
