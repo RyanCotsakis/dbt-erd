@@ -236,7 +236,17 @@ else:
                         "FK →": fk_info,
                         "Description": col.description,
                     })
-                st.dataframe(pd.DataFrame(rows), width="stretch", hide_index=True)
+                st.dataframe(
+                    pd.DataFrame(rows),
+                    width="stretch",
+                    hide_index=True,
+                    column_config={
+                        "Description": st.column_config.TextColumn(
+                            "Description",
+                            width="large",
+                        )
+                    },
+                )
             else:
                 st.write("*No columns defined.*")
 
