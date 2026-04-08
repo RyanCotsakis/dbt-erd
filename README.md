@@ -72,13 +72,27 @@ Each model is rendered as an SVG image node in vis.js — no physics engine, no 
 
 ---
 
+## Privacy
+
+This tool runs entirely on your local machine — no data is sent to external servers:
+
+- **vis.js** is bundled locally (`vis-network.min.js`) — no CDN requests
+- **Streamlit** is bound to `localhost` only and telemetry is disabled (`.streamlit/config.toml`)
+
+> **Note:** Streamlit's UI loads fonts from `fonts.googleapis.com`. This can be blocked at the OS/firewall level if needed (e.g. `/etc/hosts` entry).
+
+---
+
 ## Project structure
 
 ```
 dbt-erd/
-├── app.py          # Streamlit UI
-├── parser.py       # dbt YAML → Model dataclasses
-├── renderer.py     # Model dataclasses → standalone vis.js HTML
+├── app.py                    # Streamlit UI
+├── parser.py                 # dbt YAML → Model dataclasses
+├── renderer.py               # Model dataclasses → standalone vis.js HTML
+├── vis-network.min.js        # Bundled vis.js (no CDN)
+├── .streamlit/
+│   └── config.toml           # Binds to localhost; disables telemetry
 ├── screenshot.png
 └── requirements.txt
 ```
