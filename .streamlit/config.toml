@@ -1,0 +1,5 @@
+[server]
+address = "localhost"   # bind to loopback only — not accessible from the network
+
+[browser]
+gatherUsageStats = false  # disable telemetry to Streamlit's servers

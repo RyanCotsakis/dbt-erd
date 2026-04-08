@@ -17,7 +17,10 @@ import html as html_mod
 import json
 import textwrap
 from collections import defaultdict, deque
+from pathlib import Path
 from typing import Optional
+
+_VIS_JS = (Path(__file__).parent / "vis-network.min.js").read_text(encoding="utf-8")
 
 from parser import Model
 
@@ -269,7 +272,7 @@ def build_network(models: list[Model], visible_models: Optional[set[str]] = None
 <html>
 <head>
   <meta charset="utf-8"/>
-  <script src="https://unpkg.com/vis-network@9.1.9/standalone/umd/vis-network.min.js"></script>
+  <script>{_VIS_JS}</script>
   <style>
     body {{ margin:0; padding:0; background:#f0f2f5; }}
     #network {{ width:100%; height:780px; }}
