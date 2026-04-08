@@ -1,9 +1,14 @@
 """
 renderer.py — Build an interactive ER diagram using vis.js with SVG image nodes.
 
-Each model is rendered as an SVG table card (encoded as a base64 data URI) so that
-vis.js can display rich, styled nodes. Physics is disabled after stabilization so
-nodes stay where they are after the initial layout settles.
+Node positions are pre-computed in Python using a topological layout so cards
+never overlap on first render. Physics is disabled entirely; users can freely
+drag nodes without spring-back.
+
+Layout direction: left → right following FK edges.
+  • Models with FK columns (consumers / fact tables) sit on the left.
+  • Referenced models (dimensions / staging) sit on the right.
+  • Arrows point left → right, i.e. outward from the most "dependent" nodes.
 """
 from __future__ import annotations
 
@@ -11,6 +16,7 @@ import base64
 import html as html_mod
 import json
 import textwrap
+from collections import defaultdict, deque
 from typing import Optional
 
 from parser import Model
@@ -20,6 +26,10 @@ _W = 340          # card width px
 _HEADER_H = 36    # header row height
 _DESC_H = 22      # description row height
 _ROW_H = 26       # column row height
+
+# ── Layout spacing ─────────────────────────────────────────────────────────────
+_H_GAP = 120      # horizontal gap between columns of cards
+_V_GAP = 60       # vertical gap between cards in the same column
 
 
 def _e(text: str) -> str:
@@ -44,7 +54,6 @@ def _model_svg(model: Model) -> tuple[str, int]:
 
     # ── Header ────────────────────────────────────────────────────────────────
     p.append(f'<rect width="{_W}" height="{_HEADER_H}" fill="#2c3e50" rx="6" ry="6"/>')
-    # Cover lower rounded corners of header so body looks flush
     p.append(f'<rect y="{_HEADER_H - 6}" width="{_W}" height="6" fill="#2c3e50"/>')
     p.append(f'<text x="10" y="24" fill="#ecf0f1" font-size="13" font-weight="bold">'
              f'{_e(model.name)}</text>')
@@ -117,20 +126,95 @@ def _infer_relation_label(fk_col_tests: list[str]) -> str:
     return "1 : 1" if "unique" in fk_col_tests else "many : 1"
 
 
+def _compute_layout(
+    node_names: list[str],
+    fk_edges: list[tuple[str, str]],
+    node_heights: dict[str, int],
+) -> dict[str, tuple[float, float]]:
+    """
+    Compute non-overlapping (x, y) positions using a topological LR layout.
+
+    Each FK edge goes  src ──→ dst  where src has the FK column and dst is
+    the referenced model.  We assign:
+      • column 0 (leftmost)  = nodes that are not referenced by anyone
+                               (pure consumers: fact tables, etc.)
+      • column 1, 2, …       = nodes reached by following FK edges
+      • rightmost column     = nodes with no outgoing FK edges (pure dims)
+
+    Arrows therefore point left → right, i.e. "outward" from the consumers
+    toward the dimension/staging tables they depend on.
+
+    Within each column nodes are stacked top-to-bottom, centred on y = 0,
+    with their actual pixel heights taken into account so they never overlap.
+    """
+    node_set = set(node_names)
+    out_nbrs: dict[str, set[str]] = defaultdict(set)
+    in_nbrs:  dict[str, set[str]] = defaultdict(set)
+
+    for src, dst in fk_edges:
+        if src in node_set and dst in node_set:
+            out_nbrs[src].add(dst)
+            in_nbrs[dst].add(src)
+
+    # ── Assign columns via longest-path from sources ──────────────────────────
+    # "sources" = nodes with no incoming FK edges (nobody references them)
+    col: dict[str, int] = {}
+    queue: deque[str] = deque()
+
+    for n in node_names:
+        if not in_nbrs[n]:
+            col[n] = 0
+            queue.append(n)
+
+    while queue:
+        n = queue.popleft()
+        for nb in out_nbrs[n]:
+            candidate = col[n] + 1
+            if candidate > col.get(nb, -1):
+                col[nb] = candidate
+                queue.append(nb)
+
+    # Nodes unreachable from any source (isolated or in a cycle) → column 0
+    for n in node_names:
+        if n not in col:
+            col[n] = 0
+
+    # ── Group by column (sort alphabetically for determinism) ─────────────────
+    by_col: dict[int, list[str]] = defaultdict(list)
+    for n in sorted(node_names):
+        by_col[col[n]].append(n)
+
+    # ── Stack nodes within each column, centred on y = 0 ─────────────────────
+    positions: dict[str, tuple[float, float]] = {}
+
+    for c, nodes_in_col in by_col.items():
+        x = c * (_W + _H_GAP)
+        heights = [node_heights.get(n, _HEADER_H + _ROW_H) for n in nodes_in_col]
+        total_h = sum(heights) + _V_GAP * (len(heights) - 1)
+        y = -total_h / 2  # top of first card
+
+        for name, h in zip(nodes_in_col, heights):
+            positions[name] = (x, y + h / 2)  # vis.js anchors at centre
+            y += h + _V_GAP
+
+    return positions
+
+
 def build_network(models: list[Model], visible_models: Optional[set[str]] = None) -> str:
     """
     Build a vis.js ER diagram from parsed models and return a standalone HTML string.
     visible_models: if provided, only those model names are rendered.
     """
     all_names = {m.name for m in models}
+    visible_ms = [m for m in models if not visible_models or m.name in visible_models]
 
+    # ── Build SVG nodes ───────────────────────────────────────────────────────
+    node_heights: dict[str, int] = {}
     nodes: list[dict] = []
-    edges: list[dict] = []
 
-    for model in models:
-        if visible_models and model.name not in visible_models:
-            continue
+    for model in visible_ms:
         svg, h = _model_svg(model)
+        node_heights[model.name] = h
         nodes.append({
             "id":     model.name,
             "label":  model.name,
@@ -142,9 +226,11 @@ def build_network(models: list[Model], visible_models: Optional[set[str]] = None
                       f"<br><small>{_e(model.source_file)}</small>",
         })
 
-    for model in models:
-        if visible_models and model.name not in visible_models:
-            continue
+    # ── Collect FK edges ──────────────────────────────────────────────────────
+    fk_pairs: list[tuple[str, str]] = []
+    edges: list[dict] = []
+
+    for model in visible_ms:
         for col in model.columns:
             if not col.foreign_key:
                 continue
@@ -153,6 +239,7 @@ def build_network(models: list[Model], visible_models: Optional[set[str]] = None
                 continue
             if visible_models and target not in visible_models:
                 continue
+            fk_pairs.append((model.name, target))
             rel = _infer_relation_label(col.tests)
             edges.append({
                 "from":   model.name,
@@ -164,6 +251,16 @@ def build_network(models: list[Model], visible_models: Optional[set[str]] = None
                 "font":   {"size": 11, "background": "rgba(255,255,255,0.85)", "strokeWidth": 0},
                 "smooth": {"type": "curvedCW", "roundness": 0.25},
             })
+
+    # ── Pre-compute positions ─────────────────────────────────────────────────
+    positions = _compute_layout(
+        [m.name for m in visible_ms],
+        fk_pairs,
+        node_heights,
+    )
+    for nd in nodes:
+        if nd["id"] in positions:
+            nd["x"], nd["y"] = positions[nd["id"]]
 
     nodes_json = json.dumps(nodes)
     edges_json = json.dumps(edges)
@@ -185,18 +282,7 @@ var nodes = new vis.DataSet({nodes_json});
 var edges = new vis.DataSet({edges_json});
 
 var options = {{
-  physics: {{
-    enabled: true,
-    solver: "forceAtlas2Based",
-    forceAtlas2Based: {{
-      gravitationalConstant: -150,
-      centralGravity: 0.005,
-      springLength: 350,
-      springConstant: 0.04,
-      damping: 0.95
-    }},
-    stabilization: {{ iterations: 400, updateInterval: 25 }}
-  }},
+  physics: {{ enabled: false }},
   interaction: {{
     hover: true,
     navigationButtons: true,
@@ -227,9 +313,9 @@ var network = new vis.Network(
   options
 );
 
-// Freeze layout once the graph settles so nodes don't drift
-network.on("stabilizationIterationsDone", function() {{
-  network.setOptions({{ physics: {{ enabled: false }} }});
+// Fit all nodes into view after render
+network.once("afterDrawing", function() {{
+  network.fit({{ animation: {{ duration: 600, easingFunction: "easeInOutQuad" }} }});
 }});
 </script>
 </body>
