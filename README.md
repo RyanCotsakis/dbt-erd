@@ -4,7 +4,7 @@ An interactive Entity Relationship Diagram viewer for [dbt](https://www.getdbt.c
 
 Point it at any dbt project directory and it reads your YAML schema files to render a live, draggable ER diagram — complete with column types, primary/foreign keys, and relationship arrows.
 
-![dbt-erd screenshot](https://via.placeholder.com/900x400?text=dbt-erd+screenshot)
+![dbt-erd screenshot](screenshot.png)
 
 ---
 
