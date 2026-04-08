@@ -79,7 +79,7 @@ dbt-erd/
 ├── app.py          # Streamlit UI
 ├── parser.py       # dbt YAML → Model dataclasses
 ├── renderer.py     # Model dataclasses → standalone vis.js HTML
-├── example.yml     # Minimal example schema
+├── screenshot.png
 └── requirements.txt
 ```
 
