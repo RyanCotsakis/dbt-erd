@@ -46,11 +46,13 @@ def _fkey(parts: list[str]) -> str:
     return "folder__" + "__".join(parts)
 
 
-def _folder_toggle(folder_key: str, model_names: list[str]) -> None:
-    """on_change callback: push folder checkbox value down to its models."""
+def _folder_toggle(folder_key: str, model_names: list[str], child_folder_keys: list[str]) -> None:
+    """on_change callback: push folder checkbox value down to its models and child folders."""
     val = st.session_state[folder_key]
     for n in model_names:
         st.session_state[f"mdl_{n}"] = val
+    for fk in child_folder_keys:
+        st.session_state[fk] = val
 
 
 def _all_models_under(parts: list[str], folders_by_path: dict[str, list[str]]) -> list[str]:
@@ -62,6 +64,16 @@ def _all_models_under(parts: list[str], folders_by_path: dict[str, list[str]]) -
         if norm == prefix or norm.startswith(prefix + "/"):
             names.extend(ms)
     return names
+
+
+def _all_folder_keys_under(node: dict, path_parts: list[str]) -> list[str]:
+    """Collect all descendant folder session-state keys for a given tree node."""
+    keys: list[str] = []
+    for seg in node:
+        child_parts = path_parts + [seg]
+        keys.append(_fkey(child_parts))
+        keys.extend(_all_folder_keys_under(node[seg], child_parts))
+    return keys
 
 
 def _render_tree(
@@ -103,7 +115,7 @@ def _render_tree(
             label,
             key=fkey,
             on_change=_folder_toggle,
-            args=(fkey, all_models),
+            args=(fkey, all_models, _all_folder_keys_under(node[seg], child_parts)),
         )
 
         # Individual model checkboxes under this folder
