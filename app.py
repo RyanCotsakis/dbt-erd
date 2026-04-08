@@ -212,39 +212,30 @@ else:
         components.html(html_content, height=780, scrolling=False)
 
     with st.expander("🔍 Raw model details", expanded=False):
-        # One shared CSS block for all tables
-        st.markdown("""
-<style>
-.col-table { border-collapse: collapse; width: 100%; font-size: 13px; }
-.col-table th { background: #f0f2f6; padding: 6px 10px; text-align: left;
-                border-bottom: 2px solid #ddd; white-space: nowrap; }
-.col-table td { padding: 5px 10px; border-bottom: 1px solid #eee; vertical-align: middle; }
-.col-table tr:hover td { background: #f8f9fb; }
-.pk-badge  { background:#f39c12; color:#fff; border-radius:3px;
-             padding:1px 5px; font-size:11px; font-weight:bold; }
-.fk-badge  { background:#3498db; color:#fff; border-radius:3px;
-             padding:1px 5px; font-size:11px; font-weight:bold; }
-.type-chip { background:#dfe6e9; color:#2d3436; border-radius:3px;
-             padding:1px 5px; font-size:11px; font-family:monospace; }
-/* Description tooltip */
-.desc-wrap { position: relative; display: inline-block;
-             max-width: 300px; overflow: hidden;
-             text-overflow: ellipsis; white-space: nowrap;
-             cursor: help; vertical-align: middle; }
-.desc-wrap .desc-tip {
-    display: none; position: absolute; z-index: 9999;
-    bottom: 125%; left: 0;
-    background: #2d3436; color: #fff;
-    padding: 8px 12px; border-radius: 6px;
-    width: 300px; white-space: normal; word-wrap: break-word;
-    font-size: 12px; line-height: 1.5;
-    box-shadow: 0 3px 10px rgba(0,0,0,.3);
-}
-.desc-wrap:hover .desc-tip { display: block; }
-</style>
-""", unsafe_allow_html=True)
-
         import html as _html
+
+        TABLE_CSS = """
+<style>
+.col-table { border-collapse:collapse; width:100%; font-size:13px; }
+.col-table th {
+    background:#2c3e50; color:#ecf0f1;
+    padding:8px 12px; text-align:left;
+    border-bottom:3px solid #1a252f; white-space:nowrap;
+}
+.col-table td {
+    padding:6px 12px; border-bottom:1px solid rgba(128,128,128,0.2);
+    vertical-align:middle;
+}
+.col-table tr:hover td { background:rgba(52,152,219,0.08); }
+.pk-b { background:#f39c12; color:#fff; border-radius:3px;
+        padding:2px 6px; font-size:11px; font-weight:bold; }
+.fk-b { background:#3498db; color:#fff; border-radius:3px;
+        padding:2px 6px; font-size:11px; font-weight:bold; }
+.tc  { background:#dfe6e9; color:#2d3436; border-radius:3px;
+       padding:2px 6px; font-size:11px; font-family:monospace; }
+.desc { max-width:380px; overflow:hidden; text-overflow:ellipsis;
+        white-space:nowrap; display:block; cursor:help; }
+</style>"""
 
         for model in sorted(models, key=lambda m: (m.folder, m.name)):
             st.markdown(
@@ -261,16 +252,14 @@ else:
                         f"{col.foreign_key.to_model}.{col.foreign_key.to_column}"
                         if col.foreign_key else ""
                     )
-                    pk_cell = '<span class="pk-badge">PK</span>' if col.is_primary_key else ""
-                    fk_cell = f'<span class="fk-badge">FK</span> {_html.escape(fk_info)}' if fk_info else ""
-                    type_cell = f'<span class="type-chip">{_html.escape(col.data_type)}</span>' if col.data_type else ""
-                    desc = col.description or ""
-                    short = _html.escape(desc[:60] + ("…" if len(desc) > 60 else ""))
-                    full  = _html.escape(desc)
+                    pk_cell   = '<span class="pk-b">PK</span>' if col.is_primary_key else ""
+                    fk_cell   = f'<span class="fk-b">FK</span>&nbsp;{_html.escape(fk_info)}' if fk_info else ""
+                    type_cell = f'<span class="tc">{_html.escape(col.data_type)}</span>' if col.data_type else ""
+                    desc      = col.description or ""
                     desc_cell = (
-                        f'<span class="desc-wrap">{short}'
-                        f'<span class="desc-tip">{full}</span></span>'
-                        if desc else ""
+                        f'<span class="desc" title="{_html.escape(desc)}">'
+                        f'{_html.escape(desc[:70])}{"…" if len(desc) > 70 else ""}'
+                        f'</span>'
                     )
                     rows_html += (
                         f"<tr>"
@@ -282,6 +271,7 @@ else:
                         f"</tr>"
                     )
                 st.markdown(
+                    TABLE_CSS +
                     f'<table class="col-table"><thead><tr>'
                     f"<th>Column</th><th>Type</th><th>PK</th><th>FK →</th><th>Description</th>"
                     f"</tr></thead><tbody>{rows_html}</tbody></table><br>",
