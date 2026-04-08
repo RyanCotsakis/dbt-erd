@@ -85,29 +85,6 @@ dbt-erd/
 
 ---
 
-## Example schema
-
-```yaml
-models:
-  - name: orders
-    description: "Fact table for customer orders"
-    columns:
-      - name: order_id
-        data_type: int
-        data_tests:
-          - unique
-          - not_null
-      - name: customer_id
-        data_type: int
-        data_tests:
-          - not_null
-          - relationships:
-              to: ref('customers')
-              field: customer_id
-```
-
----
-
 ## License
 
 MIT
