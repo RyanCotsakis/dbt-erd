@@ -285,7 +285,7 @@ var rawNodes = {nodes_json};
 rawNodes.forEach(function(n) {{
   if (n.title) {{
     var div = document.createElement("div");
-    div.style.cssText = "font-family:sans-serif;font-size:13px;max-width:320px;padding:4px;";
+    div.style.cssText = "font-family:sans-serif;font-size:13px;max-width:300px;padding:6px 8px;white-space:normal;word-wrap:break-word;line-height:1.5;";
     div.innerHTML = n.title;
     n.title = div;
   }}
