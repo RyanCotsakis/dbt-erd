@@ -212,7 +212,39 @@ else:
         components.html(html_content, height=780, scrolling=False)
 
     with st.expander("🔍 Raw model details", expanded=False):
-        import pandas as pd
+        # One shared CSS block for all tables
+        st.markdown("""
+<style>
+.col-table { border-collapse: collapse; width: 100%; font-size: 13px; }
+.col-table th { background: #f0f2f6; padding: 6px 10px; text-align: left;
+                border-bottom: 2px solid #ddd; white-space: nowrap; }
+.col-table td { padding: 5px 10px; border-bottom: 1px solid #eee; vertical-align: middle; }
+.col-table tr:hover td { background: #f8f9fb; }
+.pk-badge  { background:#f39c12; color:#fff; border-radius:3px;
+             padding:1px 5px; font-size:11px; font-weight:bold; }
+.fk-badge  { background:#3498db; color:#fff; border-radius:3px;
+             padding:1px 5px; font-size:11px; font-weight:bold; }
+.type-chip { background:#dfe6e9; color:#2d3436; border-radius:3px;
+             padding:1px 5px; font-size:11px; font-family:monospace; }
+/* Description tooltip */
+.desc-wrap { position: relative; display: inline-block;
+             max-width: 300px; overflow: hidden;
+             text-overflow: ellipsis; white-space: nowrap;
+             cursor: help; vertical-align: middle; }
+.desc-wrap .desc-tip {
+    display: none; position: absolute; z-index: 9999;
+    bottom: 125%; left: 0;
+    background: #2d3436; color: #fff;
+    padding: 8px 12px; border-radius: 6px;
+    width: 300px; white-space: normal; word-wrap: break-word;
+    font-size: 12px; line-height: 1.5;
+    box-shadow: 0 3px 10px rgba(0,0,0,.3);
+}
+.desc-wrap:hover .desc-tip { display: block; }
+</style>
+""", unsafe_allow_html=True)
+
+        import html as _html
 
         for model in sorted(models, key=lambda m: (m.folder, m.name)):
             st.markdown(
@@ -223,29 +255,37 @@ else:
                 st.markdown(f"*{model.description}*")
 
             if model.columns:
-                rows = []
+                rows_html = ""
                 for col in model.columns:
                     fk_info = (
                         f"{col.foreign_key.to_model}.{col.foreign_key.to_column}"
                         if col.foreign_key else ""
                     )
-                    rows.append({
-                        "Column": col.name,
-                        "Type": col.data_type or "",
-                        "PK": "🔑" if col.is_primary_key else "",
-                        "FK →": fk_info,
-                        "Description": col.description,
-                    })
-                st.dataframe(
-                    pd.DataFrame(rows),
-                    width="stretch",
-                    hide_index=True,
-                    column_config={
-                        "Description": st.column_config.TextColumn(
-                            "Description",
-                            width="large",
-                        )
-                    },
+                    pk_cell = '<span class="pk-badge">PK</span>' if col.is_primary_key else ""
+                    fk_cell = f'<span class="fk-badge">FK</span> {_html.escape(fk_info)}' if fk_info else ""
+                    type_cell = f'<span class="type-chip">{_html.escape(col.data_type)}</span>' if col.data_type else ""
+                    desc = col.description or ""
+                    short = _html.escape(desc[:60] + ("…" if len(desc) > 60 else ""))
+                    full  = _html.escape(desc)
+                    desc_cell = (
+                        f'<span class="desc-wrap">{short}'
+                        f'<span class="desc-tip">{full}</span></span>'
+                        if desc else ""
+                    )
+                    rows_html += (
+                        f"<tr>"
+                        f"<td>{_html.escape(col.name)}</td>"
+                        f"<td>{type_cell}</td>"
+                        f"<td>{pk_cell}</td>"
+                        f"<td>{fk_cell}</td>"
+                        f"<td>{desc_cell}</td>"
+                        f"</tr>"
+                    )
+                st.markdown(
+                    f'<table class="col-table"><thead><tr>'
+                    f"<th>Column</th><th>Type</th><th>PK</th><th>FK →</th><th>Description</th>"
+                    f"</tr></thead><tbody>{rows_html}</tbody></table><br>",
+                    unsafe_allow_html=True,
                 )
             else:
                 st.write("*No columns defined.*")
