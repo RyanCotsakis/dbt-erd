@@ -278,7 +278,20 @@ def build_network(models: list[Model], visible_models: Optional[set[str]] = None
 <body>
 <div id="network"></div>
 <script>
-var nodes = new vis.DataSet({nodes_json});
+var rawNodes = {nodes_json};
+
+// vis-network 9.x sets tooltip titles via textContent, not innerHTML.
+// Convert string titles to real DOM elements so HTML renders correctly.
+rawNodes.forEach(function(n) {{
+  if (n.title) {{
+    var div = document.createElement("div");
+    div.style.cssText = "font-family:sans-serif;font-size:13px;max-width:320px;padding:4px;";
+    div.innerHTML = n.title;
+    n.title = div;
+  }}
+}});
+
+var nodes = new vis.DataSet(rawNodes);
 var edges = new vis.DataSet({edges_json});
 
 var options = {{
