@@ -1,0 +1,200 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-200.0 -237.0 1780.0 474.0" width="1780" height="474">
+  <defs><style>text{font-family:Arial,Helvetica,sans-serif}</style><marker id="arr" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0,10 3.5,0 7" fill="#74b9ff"/></marker></defs>
+  <rect x="-200.0" y="-237.0" width="1780.0" height="474.0" fill="#f0f2f5"/>
+  <path d="M630.0,-112.0 C690.0,-112.0 690.0,0.0 750.0,0.0" fill="none" stroke="#74b9ff" stroke-width="2" marker-end="url(#arr)"/>
+  <rect x="668.0" y="-66.0" width="44" height="14" rx="3" fill="white" fill-opacity="0.85"/>  <text x="690.0" y="-56.0" text-anchor="middle" font-size="10" fill="#636e72">many : 1</text>
+  <path d="M1090.0,0.0 C1150.0,0.0 1150.0,0.0 1210.0,0.0" fill="none" stroke="#74b9ff" stroke-width="2" marker-end="url(#arr)"/>
+  <rect x="1128.0" y="-10.0" width="44" height="14" rx="3" fill="white" fill-opacity="0.85"/>  <text x="1150.0" y="0.0" text-anchor="middle" font-size="10" fill="#636e72">many : 1</text>
+  <path d="M170.0,0.0 C230.0,0.0 230.0,-112.0 290.0,-112.0" fill="none" stroke="#74b9ff" stroke-width="2" marker-end="url(#arr)"/>
+  <rect x="208.0" y="-66.0" width="44" height="14" rx="3" fill="white" fill-opacity="0.85"/>  <text x="230.0" y="-56.0" text-anchor="middle" font-size="10" fill="#636e72">many : 1</text>
+  <path d="M170.0,0.0 C230.0,0.0 230.0,125.0 290.0,125.0" fill="none" stroke="#74b9ff" stroke-width="2" marker-end="url(#arr)"/>
+  <rect x="208.0" y="52.5" width="44" height="14" rx="3" fill="white" fill-opacity="0.85"/>  <text x="230.0" y="62.5" text-anchor="middle" font-size="10" fill="#636e72">many : 1</text>
+  <svg x="1210.0" y="-69.0" width="340" height="138" viewBox="0 0 340 138">
+
+<defs><style>text{font-family:Arial,Helvetica,sans-serif}</style></defs>
+<rect width="340" height="138" fill="white" rx="6" ry="6" stroke="#bdc3c7" stroke-width="1.5"/>
+<rect width="340" height="36" fill="#2c3e50" rx="6" ry="6"/>
+<rect y="30" width="340" height="6" fill="#2c3e50"/>
+<text x="10" y="24" fill="#ecf0f1" font-size="13" font-weight="bold">countries</text>
+<rect x="0" y="36" width="340" height="22" fill="#f8f9fa"/>
+<line x1="0" y1="58" x2="340" y2="58" stroke="#ecf0f1" stroke-width="1"/>
+<text x="10" y="51" fill="#7f8c8d" font-size="10" font-style="italic">Country reference data</text>
+<rect x="0" y="58" width="340" height="26" fill="#fff8e1"/>
+<rect x="6" y="63" width="22" height="15" fill="#f39c12" rx="3"/>
+<text x="9" y="74" fill="white" font-size="9" font-weight="bold">PK</text>
+<text x="34" y="76" fill="#2d3436" font-size="12" font-weight="bold">country_code</text>
+<rect x="195" y="64" width="55" height="14" fill="#dfe6e9" rx="3"/>
+<text x="200" y="75" fill="#2d3436" font-size="9" font-family="monospace">varchar</text>
+<line x1="0" y1="84" x2="340" y2="84" stroke="#ecf0f1" stroke-width="1"/>
+<rect x="0" y="84" width="340" height="26" fill="#f4f6f8"/>
+<text x="34" y="102" fill="#2d3436" font-size="12" font-weight="normal">country_name</text>
+<rect x="195" y="90" width="55" height="14" fill="#dfe6e9" rx="3"/>
+<text x="200" y="101" fill="#2d3436" font-size="9" font-family="monospace">varchar</text>
+<line x1="0" y1="110" x2="340" y2="110" stroke="#ecf0f1" stroke-width="1"/>
+<rect x="0" y="110" width="340" height="26" fill="#ffffff"/>
+<text x="34" y="128" fill="#2d3436" font-size="12" font-weight="normal">region</text>
+<rect x="195" y="116" width="55" height="14" fill="#dfe6e9" rx="3"/>
+<text x="200" y="127" fill="#2d3436" font-size="9" font-family="monospace">varchar</text>
+<line x1="0" y1="136" x2="340" y2="136" stroke="#ecf0f1" stroke-width="1"/>
+
+  </svg>
+  <svg x="750.0" y="-95.0" width="340" height="190" viewBox="0 0 340 190">
+
+<defs><style>text{font-family:Arial,Helvetica,sans-serif}</style></defs>
+<rect width="340" height="190" fill="white" rx="6" ry="6" stroke="#bdc3c7" stroke-width="1.5"/>
+<rect width="340" height="36" fill="#2c3e50" rx="6" ry="6"/>
+<rect y="30" width="340" height="6" fill="#2c3e50"/>
+<text x="10" y="24" fill="#ecf0f1" font-size="13" font-weight="bold">customers</text>
+<rect x="0" y="36" width="340" height="22" fill="#f8f9fa"/>
+<line x1="0" y1="58" x2="340" y2="58" stroke="#ecf0f1" stroke-width="1"/>
+<text x="10" y="51" fill="#7f8c8d" font-size="10" font-style="italic">One record per customer</text>
+<rect x="0" y="58" width="340" height="26" fill="#fff8e1"/>
+<rect x="6" y="63" width="22" height="15" fill="#f39c12" rx="3"/>
+<text x="9" y="74" fill="white" font-size="9" font-weight="bold">PK</text>
+<text x="34" y="76" fill="#2d3436" font-size="12" font-weight="bold">customer_id</text>
+<rect x="195" y="64" width="49" height="14" fill="#dfe6e9" rx="3"/>
+<text x="200" y="75" fill="#2d3436" font-size="9" font-family="monospace">bigint</text>
+<line x1="0" y1="84" x2="340" y2="84" stroke="#ecf0f1" stroke-width="1"/>
+<rect x="0" y="84" width="340" height="26" fill="#f4f6f8"/>
+<text x="34" y="102" fill="#2d3436" font-size="12" font-weight="normal">first_name</text>
+<rect x="195" y="90" width="55" height="14" fill="#dfe6e9" rx="3"/>
+<text x="200" y="101" fill="#2d3436" font-size="9" font-family="monospace">varchar</text>
+<line x1="0" y1="110" x2="340" y2="110" stroke="#ecf0f1" stroke-width="1"/>
+<rect x="0" y="110" width="340" height="26" fill="#ffffff"/>
+<text x="34" y="128" fill="#2d3436" font-size="12" font-weight="normal">last_name</text>
+<rect x="195" y="116" width="55" height="14" fill="#dfe6e9" rx="3"/>
+<text x="200" y="127" fill="#2d3436" font-size="9" font-family="monospace">varchar</text>
+<line x1="0" y1="136" x2="340" y2="136" stroke="#ecf0f1" stroke-width="1"/>
+<rect x="0" y="136" width="340" height="26" fill="#f4f6f8"/>
+<text x="34" y="154" fill="#2d3436" font-size="12" font-weight="normal">email</text>
+<rect x="195" y="142" width="55" height="14" fill="#dfe6e9" rx="3"/>
+<text x="200" y="153" fill="#2d3436" font-size="9" font-family="monospace">varchar</text>
+<line x1="0" y1="162" x2="340" y2="162" stroke="#ecf0f1" stroke-width="1"/>
+<rect x="0" y="162" width="340" height="26" fill="#f0f4ff"/>
+<rect x="6" y="167" width="22" height="15" fill="#3498db" rx="3"/>
+<text x="9" y="178" fill="white" font-size="9" font-weight="bold">FK</text>
+<text x="34" y="180" fill="#2d3436" font-size="12" font-weight="normal">country</text>
+<rect x="195" y="168" width="55" height="14" fill="#dfe6e9" rx="3"/>
+<text x="200" y="179" fill="#2d3436" font-size="9" font-family="monospace">varchar</text>
+<line x1="0" y1="188" x2="340" y2="188" stroke="#ecf0f1" stroke-width="1"/>
+
+  </svg>
+  <svg x="-170.0" y="-95.0" width="340" height="190" viewBox="0 0 340 190">
+
+<defs><style>text{font-family:Arial,Helvetica,sans-serif}</style></defs>
+<rect width="340" height="190" fill="white" rx="6" ry="6" stroke="#bdc3c7" stroke-width="1.5"/>
+<rect width="340" height="36" fill="#2c3e50" rx="6" ry="6"/>
+<rect y="30" width="340" height="6" fill="#2c3e50"/>
+<text x="10" y="24" fill="#ecf0f1" font-size="13" font-weight="bold">order_items</text>
+<rect x="0" y="36" width="340" height="22" fill="#f8f9fa"/>
+<line x1="0" y1="58" x2="340" y2="58" stroke="#ecf0f1" stroke-width="1"/>
+<text x="10" y="51" fill="#7f8c8d" font-size="10" font-style="italic">Line items within orders</text>
+<rect x="0" y="58" width="340" height="26" fill="#fff8e1"/>
+<rect x="6" y="63" width="22" height="15" fill="#f39c12" rx="3"/>
+<text x="9" y="74" fill="white" font-size="9" font-weight="bold">PK</text>
+<text x="34" y="76" fill="#2d3436" font-size="12" font-weight="bold">item_id</text>
+<rect x="195" y="64" width="49" height="14" fill="#dfe6e9" rx="3"/>
+<text x="200" y="75" fill="#2d3436" font-size="9" font-family="monospace">bigint</text>
+<line x1="0" y1="84" x2="340" y2="84" stroke="#ecf0f1" stroke-width="1"/>
+<rect x="0" y="84" width="340" height="26" fill="#f0f4ff"/>
+<rect x="6" y="89" width="22" height="15" fill="#3498db" rx="3"/>
+<text x="9" y="100" fill="white" font-size="9" font-weight="bold">FK</text>
+<text x="34" y="102" fill="#2d3436" font-size="12" font-weight="normal">order_id</text>
+<rect x="195" y="90" width="49" height="14" fill="#dfe6e9" rx="3"/>
+<text x="200" y="101" fill="#2d3436" font-size="9" font-family="monospace">bigint</text>
+<line x1="0" y1="110" x2="340" y2="110" stroke="#ecf0f1" stroke-width="1"/>
+<rect x="0" y="110" width="340" height="26" fill="#f0f4ff"/>
+<rect x="6" y="115" width="22" height="15" fill="#3498db" rx="3"/>
+<text x="9" y="126" fill="white" font-size="9" font-weight="bold">FK</text>
+<text x="34" y="128" fill="#2d3436" font-size="12" font-weight="normal">product_id</text>
+<rect x="195" y="116" width="49" height="14" fill="#dfe6e9" rx="3"/>
+<text x="200" y="127" fill="#2d3436" font-size="9" font-family="monospace">bigint</text>
+<line x1="0" y1="136" x2="340" y2="136" stroke="#ecf0f1" stroke-width="1"/>
+<rect x="0" y="136" width="340" height="26" fill="#f4f6f8"/>
+<text x="34" y="154" fill="#2d3436" font-size="12" font-weight="normal">quantity</text>
+<rect x="195" y="142" width="55" height="14" fill="#dfe6e9" rx="3"/>
+<text x="200" y="153" fill="#2d3436" font-size="9" font-family="monospace">integer</text>
+<line x1="0" y1="162" x2="340" y2="162" stroke="#ecf0f1" stroke-width="1"/>
+<rect x="0" y="162" width="340" height="26" fill="#ffffff"/>
+<text x="34" y="180" fill="#2d3436" font-size="12" font-weight="normal">unit_price</text>
+<rect x="195" y="168" width="55" height="14" fill="#dfe6e9" rx="3"/>
+<text x="200" y="179" fill="#2d3436" font-size="9" font-family="monospace">numeric</text>
+<line x1="0" y1="188" x2="340" y2="188" stroke="#ecf0f1" stroke-width="1"/>
+
+  </svg>
+  <svg x="290.0" y="-207.0" width="340" height="190" viewBox="0 0 340 190">
+
+<defs><style>text{font-family:Arial,Helvetica,sans-serif}</style></defs>
+<rect width="340" height="190" fill="white" rx="6" ry="6" stroke="#bdc3c7" stroke-width="1.5"/>
+<rect width="340" height="36" fill="#2c3e50" rx="6" ry="6"/>
+<rect y="30" width="340" height="6" fill="#2c3e50"/>
+<text x="10" y="24" fill="#ecf0f1" font-size="13" font-weight="bold">orders</text>
+<rect x="0" y="36" width="340" height="22" fill="#f8f9fa"/>
+<line x1="0" y1="58" x2="340" y2="58" stroke="#ecf0f1" stroke-width="1"/>
+<text x="10" y="51" fill="#7f8c8d" font-size="10" font-style="italic">One record per order</text>
+<rect x="0" y="58" width="340" height="26" fill="#fff8e1"/>
+<rect x="6" y="63" width="22" height="15" fill="#f39c12" rx="3"/>
+<text x="9" y="74" fill="white" font-size="9" font-weight="bold">PK</text>
+<text x="34" y="76" fill="#2d3436" font-size="12" font-weight="bold">order_id</text>
+<rect x="195" y="64" width="49" height="14" fill="#dfe6e9" rx="3"/>
+<text x="200" y="75" fill="#2d3436" font-size="9" font-family="monospace">bigint</text>
+<line x1="0" y1="84" x2="340" y2="84" stroke="#ecf0f1" stroke-width="1"/>
+<rect x="0" y="84" width="340" height="26" fill="#f0f4ff"/>
+<rect x="6" y="89" width="22" height="15" fill="#3498db" rx="3"/>
+<text x="9" y="100" fill="white" font-size="9" font-weight="bold">FK</text>
+<text x="34" y="102" fill="#2d3436" font-size="12" font-weight="normal">customer_id</text>
+<rect x="195" y="90" width="49" height="14" fill="#dfe6e9" rx="3"/>
+<text x="200" y="101" fill="#2d3436" font-size="9" font-family="monospace">bigint</text>
+<line x1="0" y1="110" x2="340" y2="110" stroke="#ecf0f1" stroke-width="1"/>
+<rect x="0" y="110" width="340" height="26" fill="#ffffff"/>
+<text x="34" y="128" fill="#2d3436" font-size="12" font-weight="normal">status</text>
+<rect x="195" y="116" width="55" height="14" fill="#dfe6e9" rx="3"/>
+<text x="200" y="127" fill="#2d3436" font-size="9" font-family="monospace">varchar</text>
+<line x1="0" y1="136" x2="340" y2="136" stroke="#ecf0f1" stroke-width="1"/>
+<rect x="0" y="136" width="340" height="26" fill="#f4f6f8"/>
+<text x="34" y="154" fill="#2d3436" font-size="12" font-weight="normal">order_date</text>
+<rect x="195" y="142" width="36" height="14" fill="#dfe6e9" rx="3"/>
+<text x="200" y="153" fill="#2d3436" font-size="9" font-family="monospace">date</text>
+<line x1="0" y1="162" x2="340" y2="162" stroke="#ecf0f1" stroke-width="1"/>
+<rect x="0" y="162" width="340" height="26" fill="#ffffff"/>
+<text x="34" y="180" fill="#2d3436" font-size="12" font-weight="normal">amount</text>
+<rect x="195" y="168" width="55" height="14" fill="#dfe6e9" rx="3"/>
+<text x="200" y="179" fill="#2d3436" font-size="9" font-family="monospace">numeric</text>
+<line x1="0" y1="188" x2="340" y2="188" stroke="#ecf0f1" stroke-width="1"/>
+
+  </svg>
+  <svg x="290.0" y="43.0" width="340" height="164" viewBox="0 0 340 164">
+
+<defs><style>text{font-family:Arial,Helvetica,sans-serif}</style></defs>
+<rect width="340" height="164" fill="white" rx="6" ry="6" stroke="#bdc3c7" stroke-width="1.5"/>
+<rect width="340" height="36" fill="#2c3e50" rx="6" ry="6"/>
+<rect y="30" width="340" height="6" fill="#2c3e50"/>
+<text x="10" y="24" fill="#ecf0f1" font-size="13" font-weight="bold">products</text>
+<rect x="0" y="36" width="340" height="22" fill="#f8f9fa"/>
+<line x1="0" y1="58" x2="340" y2="58" stroke="#ecf0f1" stroke-width="1"/>
+<text x="10" y="51" fill="#7f8c8d" font-size="10" font-style="italic">Product catalogue</text>
+<rect x="0" y="58" width="340" height="26" fill="#fff8e1"/>
+<rect x="6" y="63" width="22" height="15" fill="#f39c12" rx="3"/>
+<text x="9" y="74" fill="white" font-size="9" font-weight="bold">PK</text>
+<text x="34" y="76" fill="#2d3436" font-size="12" font-weight="bold">product_id</text>
+<rect x="195" y="64" width="49" height="14" fill="#dfe6e9" rx="3"/>
+<text x="200" y="75" fill="#2d3436" font-size="9" font-family="monospace">bigint</text>
+<line x1="0" y1="84" x2="340" y2="84" stroke="#ecf0f1" stroke-width="1"/>
+<rect x="0" y="84" width="340" height="26" fill="#f4f6f8"/>
+<text x="34" y="102" fill="#2d3436" font-size="12" font-weight="normal">name</text>
+<rect x="195" y="90" width="55" height="14" fill="#dfe6e9" rx="3"/>
+<text x="200" y="101" fill="#2d3436" font-size="9" font-family="monospace">varchar</text>
+<line x1="0" y1="110" x2="340" y2="110" stroke="#ecf0f1" stroke-width="1"/>
+<rect x="0" y="110" width="340" height="26" fill="#ffffff"/>
+<text x="34" y="128" fill="#2d3436" font-size="12" font-weight="normal">category</text>
+<rect x="195" y="116" width="55" height="14" fill="#dfe6e9" rx="3"/>
+<text x="200" y="127" fill="#2d3436" font-size="9" font-family="monospace">varchar</text>
+<line x1="0" y1="136" x2="340" y2="136" stroke="#ecf0f1" stroke-width="1"/>
+<rect x="0" y="136" width="340" height="26" fill="#f4f6f8"/>
+<text x="34" y="154" fill="#2d3436" font-size="12" font-weight="normal">unit_cost</text>
+<rect x="195" y="142" width="55" height="14" fill="#dfe6e9" rx="3"/>
+<text x="200" y="153" fill="#2d3436" font-size="9" font-family="monospace">numeric</text>
+<line x1="0" y1="162" x2="340" y2="162" stroke="#ecf0f1" stroke-width="1"/>
+
+  </svg>
+</svg>

@@ -203,6 +203,124 @@ def _compute_layout(
     return positions
 
 
+def build_export_svg(models: list[Model], visible_models: Optional[set[str]] = None) -> str:
+    """
+    Build a self-contained composite SVG of the full ER diagram.
+
+    All visible nodes are laid out using the same algorithm as the interactive
+    diagram. FK edges are drawn as Bézier curves with arrowheads. The returned
+    string is a standalone SVG suitable for download, embedding in docs, or
+    printing to PDF from a browser.
+    """
+    all_names = {m.name for m in models}
+    visible_ms = [m for m in models if not visible_models or m.name in visible_models]
+
+    if not visible_ms:
+        return (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="60">'
+            '<text x="10" y="35" font-family="Arial" font-size="14" fill="#999">'
+            "No models selected.</text></svg>"
+        )
+
+    # ── Per-node SVGs and heights ─────────────────────────────────────────────
+    node_svgs: dict[str, str] = {}
+    node_heights: dict[str, int] = {}
+    for model in visible_ms:
+        svg, h = _model_svg(model)
+        node_svgs[model.name] = svg
+        node_heights[model.name] = h
+
+    # ── FK edges ──────────────────────────────────────────────────────────────
+    fk_pairs: list[tuple[str, str]] = []
+    edge_info: list[tuple[str, str, str]] = []  # (from, to, relationship_label)
+    for model in visible_ms:
+        for col in model.columns:
+            if not col.foreign_key:
+                continue
+            target = col.foreign_key.to_model
+            if target not in all_names:
+                continue
+            if visible_models and target not in visible_models:
+                continue
+            fk_pairs.append((model.name, target))
+            edge_info.append((model.name, target, _infer_relation_label(col.tests)))
+
+    # ── Layout ────────────────────────────────────────────────────────────────
+    positions = _compute_layout([m.name for m in visible_ms], fk_pairs, node_heights)
+
+    # ── ViewBox: tight bounding box + padding ─────────────────────────────────
+    PAD = 30
+    min_x = min(cx - _W / 2 for cx, _ in positions.values())
+    max_x = max(cx + _W / 2 for cx, _ in positions.values())
+    min_y = min(cy - node_heights[n] / 2 for n, (_, cy) in positions.items())
+    max_y = max(cy + node_heights[n] / 2 for n, (_, cy) in positions.items())
+    vb_x, vb_y = min_x - PAD, min_y - PAD
+    vb_w, vb_h = max_x - min_x + 2 * PAD, max_y - min_y + 2 * PAD
+
+    # ── Compose SVG ───────────────────────────────────────────────────────────
+    p: list[str] = []
+    p.append(
+        f'<svg xmlns="http://www.w3.org/2000/svg"'
+        f' viewBox="{vb_x:.1f} {vb_y:.1f} {vb_w:.1f} {vb_h:.1f}"'
+        f' width="{vb_w:.0f}" height="{vb_h:.0f}">'
+    )
+    p.append(
+        "  <defs>"
+        "<style>text{font-family:Arial,Helvetica,sans-serif}</style>"
+        '<marker id="arr" markerWidth="10" markerHeight="7"'
+        ' refX="9" refY="3.5" orient="auto">'
+        '<polygon points="0 0,10 3.5,0 7" fill="#74b9ff"/>'
+        "</marker>"
+        "</defs>"
+    )
+    # Background
+    p.append(
+        f'  <rect x="{vb_x:.1f}" y="{vb_y:.1f}"'
+        f' width="{vb_w:.1f}" height="{vb_h:.1f}" fill="#f0f2f5"/>'
+    )
+
+    # Edges drawn behind nodes
+    for frm, to, label in edge_info:
+        if frm not in positions or to not in positions:
+            continue
+        fx, fy = positions[frm]
+        tx, ty = positions[to]
+        x1, y1 = fx + _W / 2, fy        # departs from right edge of source
+        x2, y2 = tx - _W / 2, ty        # arrives at left edge of target
+        mid_x = (x1 + x2) / 2
+        d = f"M{x1:.1f},{y1:.1f} C{mid_x:.1f},{y1:.1f} {mid_x:.1f},{y2:.1f} {x2:.1f},{y2:.1f}"
+        p.append(
+            f'  <path d="{d}" fill="none" stroke="#74b9ff"'
+            f' stroke-width="2" marker-end="url(#arr)"/>'
+        )
+        lx, ly = (x1 + x2) / 2, (y1 + y2) / 2
+        p.append(
+            f'  <rect x="{lx - 22:.1f}" y="{ly - 10:.1f}" width="44" height="14"'
+            f' rx="3" fill="white" fill-opacity="0.85"/>'
+            f'  <text x="{lx:.1f}" y="{ly:.1f}" text-anchor="middle"'
+            f' font-size="10" fill="#636e72">{_e(label)}</text>'
+        )
+
+    # Nodes (each model's SVG embedded as a nested <svg>)
+    for name, (cx, cy) in positions.items():
+        h = node_heights[name]
+        nx, ny = cx - _W / 2, cy - h / 2
+        raw = node_svgs[name]
+        # Strip the outer <svg ...> tag and closing </svg> to get inner content
+        inner_start = raw.index(">") + 1
+        inner_end = raw.rindex("</svg>")
+        content = raw[inner_start:inner_end]
+        p.append(
+            f'  <svg x="{nx:.1f}" y="{ny:.1f}" width="{_W}" height="{h}"'
+            f' viewBox="0 0 {_W} {h}">'
+        )
+        p.append(content)
+        p.append("  </svg>")
+
+    p.append("</svg>")
+    return "\n".join(p)
+
+
 def build_network(models: list[Model], visible_models: Optional[set[str]] = None) -> str:
     """
     Build a vis.js ER diagram from parsed models and return a standalone HTML string.

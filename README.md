@@ -15,6 +15,7 @@ Point it at any dbt project directory and it reads your YAML schema files to ren
 - **Rich table cards** — each model rendered as a styled card showing columns, data types, and PK 🟠 / FK 🔵 badges
 - **Interactive diagram** — drag nodes freely, zoom, pan; arrows are frozen in place after layout
 - **Relationship edges** — FK edges labelled with inferred cardinality (`1 : 1` or `many : 1`)
+- **SVG export** — download the full diagram as a self-contained vector SVG with one click
 
 ---
 
@@ -68,6 +69,28 @@ Each model is rendered as an SVG image node in vis.js — no physics engine, no 
 
 ---
 
+## Exporting the diagram
+
+Click **⬇️ Export SVG** in the top-right corner above the canvas to download `erd.svg` — a self-contained vector file of the full diagram (all currently visible models).
+
+![Example ERD export](erd.svg)
+
+The SVG is generated entirely in Python with no external requests. It can be embedded directly in:
+
+- **Notion / Confluence / Google Docs** — insert as an image
+- **Markdown** — reference with `![](erd.svg)`
+- **Illustrator / Inkscape** — open for further editing
+
+### Exporting to PDF
+
+1. Open `erd.svg` in your browser (drag-and-drop the file, or `File → Open`)
+2. Press `Ctrl+P` / `Cmd+P` to open the print dialog
+3. Set **Destination** to **Save as PDF**
+4. Set **Layout** to **Landscape** for wide diagrams
+5. Click **Save**
+
+---
+
 ## Privacy
 
 This tool runs entirely on your local machine — no data is sent to external servers:
@@ -90,6 +113,7 @@ dbt-erd/
 ├── .streamlit/
 │   └── config.toml           # Binds to localhost; disables telemetry
 ├── screenshot.png
+├── erd.svg                   # Example SVG export
 └── requirements.txt
 ```
 

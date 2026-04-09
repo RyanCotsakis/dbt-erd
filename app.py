@@ -16,7 +16,7 @@ import streamlit as st
 sys.path.insert(0, str(Path(__file__).parent))
 
 from parser import parse_directory
-from renderer import build_network
+from renderer import build_network, build_export_svg
 
 st.set_page_config(
     page_title="dbt ER Diagram",
@@ -201,11 +201,22 @@ if not st.session_state.get("path_ok", True):
 elif not models:
     st.warning("No dbt models found. Make sure the directory contains `*.yml` files with a `models:` key.")
 else:
-    st.caption(f"Found **{len(models)}** model(s) — showing **{len(visible)}** selected.")
-
     if not visible:
+        st.caption(f"Found **{len(models)}** model(s) — select models in the sidebar to display the diagram.")
         st.info("Select at least one model in the sidebar to display the diagram.")
     else:
+        col_title, col_export = st.columns([8, 1])
+        with col_title:
+            st.caption(f"Showing **{len(visible)}** of **{len(models)}** model(s).")
+        with col_export:
+            export_svg = build_export_svg(models, visible_models=visible)
+            st.download_button(
+                "⬇️ Export SVG",
+                data=export_svg,
+                file_name="erd.svg",
+                mime="image/svg+xml",
+                use_container_width=True,
+            )
         html_content = build_network(models, visible_models=visible)
         src = "data:text/html;base64," + base64.b64encode(html_content.encode()).decode()
         st.iframe(src, height=780)
