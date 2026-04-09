@@ -13,12 +13,8 @@ Point it at any dbt project directory and it reads your YAML schema files to ren
 - **Auto-discovery** — recursively scans the `models/` directory for `*.yml` schema files
 - **dbt v1.6+ compatible** — supports both `tests:` and `data_tests:` key syntax, and nested `arguments:` in `relationships` config
 - **Rich table cards** — each model rendered as a styled card showing columns, data types, and PK 🟠 / FK 🔵 badges
-- **Smart layout** — pre-computed topological layout places models in dependency order (FK sources on the left, referenced dims on the right) with no overlapping cards
 - **Interactive diagram** — drag nodes freely, zoom, pan; arrows are frozen in place after layout
 - **Relationship edges** — FK edges labelled with inferred cardinality (`1 : 1` or `many : 1`)
-- **Folder tree sidebar** — filter models by folder with a collapsible tree; parent toggles propagate to all children
-- **Enter-to-reload** — just type a new path and press Enter
-- **Raw model details** — expandable table showing all columns with hover tooltips on descriptions
 
 ---
 
