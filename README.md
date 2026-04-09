@@ -75,19 +75,13 @@ Click **⬇️ Export SVG** in the top-right corner above the canvas to download
 
 ![Example ERD export](erd.svg)
 
-The SVG is generated entirely in Python with no external requests. It can be embedded directly in:
-
-- **Notion / Confluence / Google Docs** — insert as an image
-- **Markdown** — reference with `![](erd.svg)`
-- **Illustrator / Inkscape** — open for further editing
+The SVG is generated entirely in Python with no external requests.
 
 ### Exporting to PDF
 
 1. Open `erd.svg` in your browser (drag-and-drop the file, or `File → Open`)
 2. Press `Ctrl+P` / `Cmd+P` to open the print dialog
 3. Set **Destination** to **Save as PDF**
-4. Set **Layout** to **Landscape** for wide diagrams
-5. Click **Save**
 
 ---
 
